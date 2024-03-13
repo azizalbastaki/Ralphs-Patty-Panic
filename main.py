@@ -9,6 +9,7 @@ class MyApp(ShowBase):
 
         def __init__(self):
             ShowBase.__init__(self)
+            self.appStatus = "STARTMENU"
 
             # add an onscreen title that says "Ralph's Patty Panic" in bold
             self.title = OnscreenText(text="Ralph's Patty Panic",
@@ -25,8 +26,6 @@ class MyApp(ShowBase):
                                      pos=(0, -0.95), fg=(1, 1, 1, 1),
                                      scale=0.07)
 
-            # load ralph model next to the button
-            # make ralph and actor instead of a model
             self.ralph = Actor("assets/models/ralph",
                                {"run": "assets/models/ralph-run",
                                 "walk": "assets/models/ralph-walk"})
@@ -35,12 +34,35 @@ class MyApp(ShowBase):
             self.ralph.setPos(0, 25, -5)
             self.ralph.setScale(1)
             self.ralph.reparentTo(render)
-            # make ralph run constantly
             self.ralph.loop("run")
 
+            # add update to task manager update loop
+            self.taskMgr.add(self.update, "update")
+        # make an update loop
+        def update(self, task):
+            if self.appStatus == "STARTMENU":
+                self.title.show()
+                self.button.show()
+                self.name.show()
+            elif self.appStatus == "TRANSITION_GAME":
+                self.title.hide()
+                self.button.hide()
+                self.name.hide()
+                # move ralph away from the camera to the left edge of the screen
+                if self.ralph.getX() < -12:
+                    pass
+                else:
+                    self.ralph.setX(self.ralph, -0.1)
+                if self.ralph.getY() > 50:
+                    pass
+                else:
+                    self.ralph.setY(self.ralph, 0.3)
+
+            return task.cont
 
         def printHello(self):
             print('Hello World')
+            self.appStatus = "TRANSITION_GAME"
 
         def close(self):
             print('Closing the application')
