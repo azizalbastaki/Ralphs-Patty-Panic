@@ -10,7 +10,7 @@ class MyApp(ShowBase):
         def __init__(self):
             ShowBase.__init__(self)
             self.appStatus = "STARTMENU"
-
+            self.ralphStatus = "RUN"
             # add an onscreen title that says "Ralph's Patty Panic" in bold
             self.title = OnscreenText(text="Ralph's Patty Panic",
                                       style=1, fg=(1, 1, 1, 1),
@@ -108,18 +108,27 @@ class MyApp(ShowBase):
                                              scale=0.07)
 
         def gameLoop(self, task):
+
             dt = globalClock.getDt()
-            self.ralph.stop()
-            self.ralph.pose("walk", 0)
+            currentAnim = self.ralph.getCurrentAnim()
             # make WASD controls for ralph using delta time, moves right and left only
             if self.keyMap["left"]:
-                self.ralph.setY(self.ralph, 10*dt)
-                self.ralph.loop("run")
-            if self.keyMap["right"]:
                 self.ralph.setY(self.ralph, -10*dt)
-                self.ralph.loop("run")
-            else:
+                if self.ralphStatus != "RUN":
+                    self.ralph.loop("run")
+                    self.ralphStatus = "RUN"
+                self.ralph.setH(270)
+            if self.keyMap["right"]:
+                self.ralph.setH(90)
+                self.ralph.setY(self.ralph, -10*dt)
+                if self.ralphStatus != "RUN":
+                    self.ralph.loop("run")
+                    self.ralphStatus = "RUN"
+            if not self.keyMap["left"] and not self.keyMap["right"]:
                 self.ralph.stop()
+                self.ralph.pose("walk", 17)
+                self.ralphStatus = "IDLE"
+
             return task.cont
 
 app = MyApp()
