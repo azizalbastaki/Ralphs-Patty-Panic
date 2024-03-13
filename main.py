@@ -40,6 +40,9 @@ class MyApp(ShowBase):
             self.taskMgr.add(self.update, "update")
         # make an update loop
         def update(self, task):
+            # make a delta time variable
+            dt = globalClock.getDt()
+            # check the status of the game
             if self.appStatus == "STARTMENU":
                 self.title.show()
                 self.button.show()
@@ -48,16 +51,26 @@ class MyApp(ShowBase):
                 self.title.hide()
                 self.button.hide()
                 self.name.hide()
+                xMovementComplete = False
+                yMovementComplete = False
                 # move ralph away from the camera to the left edge of the screen
-                if self.ralph.getX() < -12:
-                    pass
+                if self.ralph.getX() < -20:
+                    xMovementComplete = True
                 else:
-                    self.ralph.setX(self.ralph, -0.1)
-                if self.ralph.getY() > 50:
-                    pass
+                    self.ralph.setX(self.ralph, -10*dt)
+                if self.ralph.getY() > 70:
+                    yMovementComplete = True
                 else:
-                    self.ralph.setY(self.ralph, 0.3)
+                    self.ralph.setY(self.ralph, 35*dt)
 
+                if xMovementComplete and yMovementComplete:
+                    if self.ralph.getH() < 90:
+                        self.ralph.setH(self.ralph, 90*dt)
+                    else:
+                        self.ralph.setH(90)
+                        self.appStatus = "INSTRUCTIONS"
+            elif self.appStatus == "INSTRUCTIONS":
+                self.showInstructions(task)
             return task.cont
 
         def printHello(self):
@@ -67,6 +80,12 @@ class MyApp(ShowBase):
         def close(self):
             print('Closing the application')
             self.destroy()
+
+        def showInstructions(self, task):
+            # create a new onscreen text object that says "Press 'SPACE' to go to the next instruction"
+            self.instructions = OnscreenText(text="Press 'SPACE' to go to the next instruction",
+                                             pos=(0, -0.95), fg=(1, 1, 1, 1),
+                                             scale=0.07)
 
 app = MyApp()
 app.run()
