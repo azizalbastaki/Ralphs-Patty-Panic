@@ -184,6 +184,7 @@ class MyApp(ShowBase):
                         makeRalphRun()
                         break
 
+
             if not self.keyMap["left"] and not self.keyMap["right"] and not self.keyMap["up"] and not self.keyMap["down"]:
                 self.ralph.stop()
                 self.ralph.pose("walk", 17)
