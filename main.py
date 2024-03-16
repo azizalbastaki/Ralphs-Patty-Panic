@@ -48,21 +48,30 @@ class MyApp(ShowBase):
 
             plnp.setPos(0,-70,0)
             render.setLight(plnp)
-
+            self.staircaseCoordinates = []
 
             self.keyMap = {
                 "left": False,
-                "right": False
+                "right": False,
+                "up": False,
+                "down": False,
+                "space": False
             }
 
             self.accept("a", self.updateKey, ["left", True])
             self.accept("a-up", self.updateKey, ["left", False])
 
-            self.accept("s", self.updateKey, ["backwards", True])
-            self.accept("s-up", self.updateKey, ["backwards", False])
+            self.accept("s", self.updateKey, ["down", True])
+            self.accept("s-up", self.updateKey, ["down", False])
 
             self.accept("d", self.updateKey, ["right", True])
             self.accept("d-up", self.updateKey, ["right", False])
+
+            self.accept("w", self.updateKey, ["up", True])
+            self.accept("w-up", self.updateKey, ["up", False])
+
+            self.accept("space", self.updateKey, ["space", True])
+            self.accept("space-up", self.updateKey, ["space", False])
 
             # add update to task manager update loop
             self.taskMgr.add(self.update, "update")
@@ -129,27 +138,53 @@ class MyApp(ShowBase):
                                              scale=0.07)
 
         def gameLoop(self, task):
+            print(self.ralph.getZ())
+            def makeRalphRun():
+                if self.ralphStatus != "RUN":
+                    self.ralph.loop("run")
+                    self.ralphStatus = "RUN"
+
             if int(self.ralph.getX()) < -22:
                 self.ralph.setX(-22)
             if self.ralph.getX() > 22:
                 self.ralph.setX(22)
+            if self.ralph.getZ() > 10:
+                self.ralph.setZ(9.9)
+            if self.ralph.getZ() < -10:
+                self.ralph.setZ(-10)
 
             dt = globalClock.getDt()
             currentAnim = self.ralph.getCurrentAnim()
             # make WASD controls for ralph using delta time, moves right and left only
             if self.keyMap["left"]:
                 self.ralph.setY(self.ralph, -10*dt)
-                if self.ralphStatus != "RUN":
-                    self.ralph.loop("run")
-                    self.ralphStatus = "RUN"
+                makeRalphRun()
                 self.ralph.setH(270)
+
             if self.keyMap["right"]:
                 self.ralph.setH(90)
                 self.ralph.setY(self.ralph, -10*dt)
-                if self.ralphStatus != "RUN":
-                    self.ralph.loop("run")
-                    self.ralphStatus = "RUN"
-            if not self.keyMap["left"] and not self.keyMap["right"]:
+                makeRalphRun()
+
+            if self.keyMap["up"]:
+                ralphX = self.ralph.getX()
+                for staircase in self.staircaseCoordinates:
+                    if abs(ralphX-staircase) < 2:
+                        self.ralph.setZ(self.ralph, 10*dt)
+                        self.ralph.setH(180)
+                        makeRalphRun()
+                        break
+
+            if self.keyMap["down"]:
+                ralphX = self.ralph.getX()
+                for staircase in self.staircaseCoordinates:
+                    if abs(ralphX-staircase) < 2:
+                        self.ralph.setZ(self.ralph, -10*dt)
+                        self.ralph.setH(180)
+                        makeRalphRun()
+                        break
+
+            if not self.keyMap["left"] and not self.keyMap["right"] and not self.keyMap["up"] and not self.keyMap["down"]:
                 self.ralph.stop()
                 self.ralph.pose("walk", 17)
                 self.ralphStatus = "IDLE"
@@ -160,11 +195,12 @@ class MyApp(ShowBase):
         def generateMap(self):
 
             def makeBaconStairCase(xAxis):
+                self.staircaseCoordinates.append(xAxis)
                 for i in range(0, 10):
-                    self.bacon = loader.loadModel("assets/models/bacon.gltf")
-                    self.bacon.setPos(xAxis, 70, -7 + i*2)
-                    self.bacon.setScale(3)
-                    self.bacon.reparentTo(render)
+                    bacon = loader.loadModel("assets/models/bacon.gltf")
+                    bacon.setPos(xAxis, 73, -7 + i*2)
+                    bacon.setScale(3)
+                    bacon.reparentTo(render)
 
 
             # make a for loop making 10 copies of the cube, next to each other
@@ -178,12 +214,15 @@ class MyApp(ShowBase):
                 self.cube.reparentTo(render)
 
             self.plate = loader.loadModel("assets/models/plate.gltf")
-            self.plate.setPos(0, 50, -9)
+            self.plate.setPos(9, 50, -9)
             self.plate.setScale(5)
             self.plate.reparentTo(render)
 
-            makeBaconStairCase(-15)
-            makeBaconStairCase(15)
+            makeBaconStairCase(-20)
+            makeBaconStairCase(20)
+            makeBaconStairCase(4)
+            makeBaconStairCase(-8)
+
 
 
 
