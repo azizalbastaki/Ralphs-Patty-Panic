@@ -4,13 +4,17 @@ from direct.showbase.ShowBase import ShowBase
 from direct.gui.OnscreenText import OnscreenText
 from direct.gui.DirectGui import DirectButton
 from direct.actor.Actor import Actor
-
+# import pointlights
+from panda3d.core import PointLight
 class MyApp(ShowBase):
 
         def __init__(self):
             ShowBase.__init__(self)
             self.appStatus = "STARTMENU"
             self.ralphStatus = "RUN"
+            self.startingX = -22
+            self.startingY = 70
+            self.startingZ = -10
 
             # add an onscreen title that says "Ralph's Patty Panic" in bold
             self.title = OnscreenText(text="Ralph's Patty Panic",
@@ -36,6 +40,15 @@ class MyApp(ShowBase):
             self.ralph.setScale(1)
             self.ralph.reparentTo(render)
             self.ralph.loop("run")
+            # give ralph a pointlight
+            plight = PointLight('plight')
+            plight.setColor((2, 2, 2, 1))
+            plight.setColorTemperature(6000)
+            plnp = render.attachNewNode(plight)
+
+            plnp.setPos(0,-70,0)
+            render.setLight(plnp)
+
 
             self.keyMap = {
                 "left": False,
@@ -68,6 +81,7 @@ class MyApp(ShowBase):
                 self.name.hide()
                 xMovementComplete = False
                 yMovementComplete = False
+                zMovementComplete = False
                 # move ralph away from the camera to the left edge of the screen
                 if self.ralph.getX() < -20:
                     xMovementComplete = True
@@ -77,8 +91,12 @@ class MyApp(ShowBase):
                     yMovementComplete = True
                 else:
                     self.ralph.setY(self.ralph, 35*dt)
+                if self.ralph.getZ() < -10:
+                    zMovementComplete = True
+                else:
+                    self.ralph.setZ(self.ralph, -10*dt)
 
-                if xMovementComplete and yMovementComplete:
+                if xMovementComplete and yMovementComplete and zMovementComplete:
                     if self.ralph.getH() < 90:
                         self.ralph.setH(self.ralph, 90*dt)
                     else:
@@ -111,6 +129,10 @@ class MyApp(ShowBase):
                                              scale=0.07)
 
         def gameLoop(self, task):
+            if int(self.ralph.getX()) < -22:
+                self.ralph.setX(-22)
+            if self.ralph.getX() > 22:
+                self.ralph.setX(22)
 
             dt = globalClock.getDt()
             currentAnim = self.ralph.getCurrentAnim()
@@ -136,8 +158,17 @@ class MyApp(ShowBase):
 
 
         def generateMap(self):
+
+            def makeBaconStairCase(xAxis):
+                for i in range(0, 10):
+                    self.bacon = loader.loadModel("assets/models/bacon.gltf")
+                    self.bacon.setPos(xAxis, 70, -7 + i*2)
+                    self.bacon.setScale(3)
+                    self.bacon.reparentTo(render)
+
+
             # make a for loop making 10 copies of the cube, next to each other
-            for i in range(20):
+            for i in range(-1, 21):
                 self.cube = loader.loadModel("models/box")
                 #set the scale of the new cube to be 2
                 self.cube.setScale(2)
@@ -145,6 +176,15 @@ class MyApp(ShowBase):
 
                 self.cube.setPos(self.ralph.getX() + i*2, self.ralph.getY(), self.ralph.getZ()-2)
                 self.cube.reparentTo(render)
+
+            self.plate = loader.loadModel("assets/models/plate.gltf")
+            self.plate.setPos(0, 50, -9)
+            self.plate.setScale(5)
+            self.plate.reparentTo(render)
+
+            makeBaconStairCase(-15)
+            makeBaconStairCase(15)
+
 
 
 
