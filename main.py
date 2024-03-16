@@ -11,6 +11,7 @@ class MyApp(ShowBase):
             ShowBase.__init__(self)
             self.appStatus = "STARTMENU"
             self.ralphStatus = "RUN"
+
             # add an onscreen title that says "Ralph's Patty Panic" in bold
             self.title = OnscreenText(text="Ralph's Patty Panic",
                                       style=1, fg=(1, 1, 1, 1),
@@ -89,6 +90,8 @@ class MyApp(ShowBase):
                 return task.cont
             else:
                 self.taskMgr.add(self.gameLoop, "update")
+                self.generateMap()
+
                 return task.done
 
         def updateKey(self, key, value):
@@ -130,6 +133,20 @@ class MyApp(ShowBase):
                 self.ralphStatus = "IDLE"
 
             return task.cont
+
+
+        def generateMap(self):
+            # make a for loop making 10 copies of the cube, next to each other
+            for i in range(20):
+                self.cube = loader.loadModel("models/box")
+                #set the scale of the new cube to be 2
+                self.cube.setScale(2)
+                # set the position of the new cube to be the length of the cube away from the previous cube
+
+                self.cube.setPos(self.ralph.getX() + i*2, self.ralph.getY(), self.ralph.getZ()-2)
+                self.cube.reparentTo(render)
+
+
 
 app = MyApp()
 app.run()
