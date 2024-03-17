@@ -22,7 +22,7 @@ class MyApp(ShowBase):
                                       pos=(0, 0.7), scale=0.15)
 
             self.setBackgroundColor(0, 0, 0, 1)
-            self.button = DirectButton(text=("Start"), scale=0.1, command=self.printHello)
+            self.button = DirectButton(text=("Start"), scale=0.1, command=self.startgame)
             self.button.setPos(0, 0, 0.3)
             self.button['text_fg'] = (0, 1, 1, 1)
             self.button['frameColor'] = (0, 0, 0, 0)
@@ -123,7 +123,7 @@ class MyApp(ShowBase):
 
         def updateKey(self, key, value):
             self.keyMap[key] = value
-        def printHello(self):
+        def startgame(self):
             print('Hello World')
             self.appStatus = "TRANSITION_GAME"
 
@@ -138,7 +138,6 @@ class MyApp(ShowBase):
                                              scale=0.07)
 
         def gameLoop(self, task):
-            print(self.ralph.getZ())
             def makeRalphRun():
                 if self.ralphStatus != "RUN":
                     self.ralph.loop("run")
@@ -152,6 +151,7 @@ class MyApp(ShowBase):
                 self.ralph.setZ(9.9)
             if self.ralph.getZ() < -10:
                 self.ralph.setZ(-10)
+            self.ralph.setY(70)
 
             dt = globalClock.getDt()
             currentAnim = self.ralph.getCurrentAnim()
