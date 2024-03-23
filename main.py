@@ -6,6 +6,12 @@ from direct.gui.DirectGui import DirectButton
 from direct.actor.Actor import Actor
 # import pointlights
 from panda3d.core import PointLight
+
+
+# todos:
+
+
+
 class MyApp(ShowBase):
 
         def __init__(self):
@@ -172,6 +178,7 @@ class MyApp(ShowBase):
                     if abs(ralphX-staircase) < 2:
                         self.ralph.setZ(self.ralph, 10*dt)
                         self.ralph.setH(180)
+                        self.ralph.setX(staircase)
                         makeRalphRun()
                         break
 
@@ -181,6 +188,7 @@ class MyApp(ShowBase):
                     if abs(ralphX-staircase) < 2:
                         self.ralph.setZ(self.ralph, -10*dt)
                         self.ralph.setH(180)
+                        self.ralph.setX(staircase)
                         makeRalphRun()
                         break
 
@@ -197,23 +205,24 @@ class MyApp(ShowBase):
 
             def makeBaconStairCase(xAxis):
                 self.staircaseCoordinates.append(xAxis)
-                for i in range(0, 10):
+                for i in range(0, 11):
                     bacon = loader.loadModel("assets/models/bacon.gltf")
-                    bacon.setPos(xAxis, 73, -7 + i*2)
-                    bacon.setScale(3)
+                    bacon.setPos(xAxis, 70, -7 + i*2)
+                    bacon.setScale(2)
                     bacon.reparentTo(render)
 
+            def makeRowOfCubes(zaxis, xstart, xend, height=1):
+                scale = 1
+                for row in range(0, height):
+                    for i in range(xstart, xend, scale):
+                        self.cube = loader.loadModel("models/box")
+                        self.cube.setScale(scale)
+                        self.cube.setPos(i*scale, 80, zaxis-(scale*row))
+                        self.cube.reparentTo(render)
 
-            # make a for loop making 10 copies of the cube, next to each other
-            for i in range(-1, 21):
-                self.cube = loader.loadModel("models/box")
-                #set the scale of the new cube to be 2
-                self.cube.setScale(2)
-                # set the position of the new cube to be the length of the cube away from the previous cube
 
-                self.cube.setPos(self.ralph.getX() + i*2, self.ralph.getY(), self.ralph.getZ()-2)
-                self.cube.reparentTo(render)
-
+            makeRowOfCubes(self.ralph.getZ()-2, -28, 28,2)
+            makeRowOfCubes(self.ralph.getZ()+10, -8, -4)
             self.plate = loader.loadModel("assets/models/plate.gltf")
             self.plate.setPos(9, 50, -9)
             self.plate.setScale(5)
