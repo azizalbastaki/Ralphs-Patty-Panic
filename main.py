@@ -61,7 +61,8 @@ class MyApp(ShowBase):
                 "right": False,
                 "up": False,
                 "down": False,
-                "space": False
+                "space": False,
+                "p": False
             }
 
             self.accept("a", self.updateKey, ["left", True])
@@ -78,6 +79,9 @@ class MyApp(ShowBase):
 
             self.accept("space", self.updateKey, ["space", True])
             self.accept("space-up", self.updateKey, ["space", False])
+
+            self.accept("p", self.updateKey, ["p", True])
+            self.accept("p-up", self.updateKey, ["p", False])
 
             # add update to task manager update loop
             self.taskMgr.add(self.update, "update")
@@ -197,6 +201,13 @@ class MyApp(ShowBase):
                 self.ralph.stop()
                 self.ralph.pose("walk", 17)
                 self.ralphStatus = "IDLE"
+
+            # print ralph's coordinates if the 'p' key is pressed
+            # make sure it only prints once.
+
+            if self.keyMap["p"]:
+                print(self.ralph.getPos())
+                self.keyMap["p"] = False
 
             return task.cont
 
