@@ -15,6 +15,8 @@ class MyApp(ShowBase):
 
         def __init__(self):
             ShowBase.__init__(self)
+            self.titleFont = loader.loadFont("assets/fonts/LuckiestGuy-Regular.ttf")
+
             self.staircaseCoordinates = []
 
             self.keyMap = {
@@ -56,7 +58,7 @@ class MyApp(ShowBase):
             self.startingZ = -10
 
             # add an onscreen title that says "Ralph's Patty Panic" in bold
-            self.title = OnscreenText(text="Ralph's Patty Panic",
+            self.title = OnscreenText(text="Ralph's Patty Panic", font=self.titleFont,
                                       style=1, fg=(1, 1, 1, 1),
                                       pos=(0, 0.7), scale=0.15)
 
@@ -66,7 +68,8 @@ class MyApp(ShowBase):
             self.button['text_fg'] = (0, 1, 1, 1)
             self.button['frameColor'] = (0, 0, 0, 0)
 
-            self.name = OnscreenText(text="2024 Abdulaziz Albastaki",
+
+            self.name = OnscreenText(text="2024 Abdulaziz Albastaki", font=self.titleFont,
                                      pos=(0, -0.95), fg=(1, 1, 1, 1),
                                      scale=0.07)
 
