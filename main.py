@@ -6,9 +6,8 @@ from direct.gui.DirectGui import DirectButton
 from direct.actor.Actor import Actor
 # import pointlights
 from panda3d.core import PointLight
-
-
-# todos:
+from panda3d_logos.splashes import WindowSplash, RainbowSplash
+from threading import Timer
 
 
 
@@ -16,44 +15,6 @@ class MyApp(ShowBase):
 
         def __init__(self):
             ShowBase.__init__(self)
-            self.appStatus = "STARTMENU"
-            self.ralphStatus = "RUN"
-            self.startingX = -22
-            self.startingY = 70
-            self.startingZ = -10
-
-            # add an onscreen title that says "Ralph's Patty Panic" in bold
-            self.title = OnscreenText(text="Ralph's Patty Panic",
-                                      style=1, fg=(1, 1, 1, 1),
-                                      pos=(0, 0.7), scale=0.15)
-
-            self.setBackgroundColor(0, 0, 0, 1)
-            self.button = DirectButton(text=("Start"), scale=0.1, command=self.startgame)
-            self.button.setPos(0, 0, 0.3)
-            self.button['text_fg'] = (0, 1, 1, 1)
-            self.button['frameColor'] = (0, 0, 0, 0)
-
-            self.name = OnscreenText(text="2024 Abdulaziz Albastaki",
-                                     pos=(0, -0.95), fg=(1, 1, 1, 1),
-                                     scale=0.07)
-
-            self.ralph = Actor("assets/models/ralph",
-                               {"run": "assets/models/ralph-run",
-                                "walk": "assets/models/ralph-walk"})
-            self.ralph.reparentTo(render)
-            self.ralph.setScale(.2)
-            self.ralph.setPos(0, 25, -5)
-            self.ralph.setScale(1)
-            self.ralph.reparentTo(render)
-            self.ralph.loop("run")
-            # give ralph a pointlight
-            plight = PointLight('plight')
-            plight.setColor((2, 2, 2, 1))
-            plight.setColorTemperature(6000)
-            plnp = render.attachNewNode(plight)
-
-            plnp.setPos(0,-70,0)
-            render.setLight(plnp)
             self.staircaseCoordinates = []
 
             self.keyMap = {
@@ -84,8 +45,62 @@ class MyApp(ShowBase):
             self.accept("p-up", self.updateKey, ["p", False])
 
             # add update to task manager update loop
-            self.taskMgr.add(self.update, "update")
+            self.taskMgr.add(self.splashScreen, "splash")
+
         # make an update loop
+        def setupStartingScreen(self):
+            self.appStatus = "STARTMENU"
+            self.ralphStatus = "RUN"
+            self.startingX = -22
+            self.startingY = 70
+            self.startingZ = -10
+
+            # add an onscreen title that says "Ralph's Patty Panic" in bold
+            self.title = OnscreenText(text="Ralph's Patty Panic",
+                                      style=1, fg=(1, 1, 1, 1),
+                                      pos=(0, 0.7), scale=0.15)
+
+            self.setBackgroundColor(0, 0, 0, 1)
+            self.button = DirectButton(text=("Start"), scale=0.1, command=self.startgame)
+            self.button.setPos(0, 0, 0.3)
+            self.button['text_fg'] = (0, 1, 1, 1)
+            self.button['frameColor'] = (0, 0, 0, 0)
+
+            self.name = OnscreenText(text="2024 Abdulaziz Albastaki",
+                                     pos=(0, -0.95), fg=(1, 1, 1, 1),
+                                     scale=0.07)
+
+
+            self.ralph = Actor("assets/models/ralph",
+                               {"run": "assets/models/ralph-run",
+                                "walk": "assets/models/ralph-walk"})
+            self.ralph.reparentTo(render)
+            self.ralph.setScale(.2)
+            self.ralph.setPos(0, 25, -5)
+            self.ralph.setScale(1)
+            self.ralph.reparentTo(render)
+            self.ralph.loop("run")
+            # give ralph a pointlight
+            plight = PointLight('plight')
+            plight.setColor((2, 2, 2, 1))
+            plight.setColorTemperature(6000)
+            plnp = render.attachNewNode(plight)
+
+            plnp.setPos(0,-70,0)
+            render.setLight(plnp)
+
+        def splashScreen(self,task):
+            splash = RainbowSplash()
+            interval = splash.setup()
+            interval.start()
+            def tearsplashscreen():
+                splash.teardown()
+                self.setupStartingScreen()
+                self.taskMgr.add(self.update, "update")
+                return task.done
+            teardownTimer = Timer(interval.get_duration()+2, tearsplashscreen)
+            teardownTimer.start()
+
         def update(self, task):
             # make a delta time variable
             dt = globalClock.getDt()
