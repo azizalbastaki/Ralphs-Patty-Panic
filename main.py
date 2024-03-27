@@ -6,7 +6,7 @@ from direct.gui.DirectGui import DirectButton
 from direct.actor.Actor import Actor
 # import pointlights
 from panda3d.core import PointLight
-from panda3d_logos.splashes import WindowSplash, RainbowSplash
+from panda3d_logos.splashes import RainbowSplash
 from threading import Timer
 
 
@@ -157,7 +157,6 @@ class MyApp(ShowBase):
             self.destroy()
 
         def showInstructions(self, task):
-            # create a new onscreen text object that says "Press 'SPACE' to go to the next instruction"
             self.instructions = OnscreenText(text="Press 'SPACE' to go to the next instruction",
                                              pos=(0, -0.95), fg=(1, 1, 1, 1),
                                              scale=0.07)
